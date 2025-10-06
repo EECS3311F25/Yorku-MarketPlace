@@ -1,4 +1,5 @@
 Group P
+Discord Server Link: https://discord.gg/4BgXbJAWJc
 1. JeelKumar Patel
    Student Id: 211952761
    Yorku Email: Jeelp50@my.yorku.ca

@@ -7,4 +7,4 @@
 | Pooja Shah         | TBD     | 219677038  | poojas04@my.yorku.ca      | 647-819-2802        | kuji#041         |
 | Pulkit Grover      | TBD     | 220367157  | pulkit09@my.yorku.ca      | 416-540-9348        | pulkit#09        |
 
-**Discord Invite :https://discord.gg/4BgXbJAWJc**
+**Discord Invite :https://discord.gg/BbRrZJtzR**

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Sign up · Marketplace</title>
+        <link rel="stylesheet" th:href="@{/styles.css}" />
+        <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');</style>
+</head>
+<body>
+    <div class="center-wrap">
+        <div class="card">
+            <div class="brand">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="24" height="24" rx="6" fill="#3b82f6" />
+                    <path d="M7 12h10" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+                <h1>Create account</h1>
+            </div>
+            <div class="subtitle">Join Marketplace — it's quick and free</div>
+
+            <div th:if="${error}" class="error" th:text="${error}"></div>
+
+            <form method="post" action="/signup">
+                <div class="form-row">
+                    <label for="username">Username</label>
+                    <input id="username" name="username" type="text" required />
+                </div>
+                <div class="form-row">
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" required />
+                </div>
+                <div class="form-row">
+                    <label for="email">Email (optional)</label>
+                    <input id="email" name="email" type="email" />
+                </div>
+
+                <div style="margin-top:12px">
+                    <button class="btn" type="submit">Create account</button>
+                </div>
+            </form>
+
+            <div class="muted">Already have an account? <a href="/login">Sign in</a></div>
+        </div>
+    </div>
+</body>
+</html>

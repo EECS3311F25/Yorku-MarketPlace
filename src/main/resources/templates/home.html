@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Home · Marketplace</title>
+    <link rel="stylesheet" th:href="@{/styles.css}" />
+</head>
+<body>
+    <div class="center-wrap">
+        <div class="card" style="max-width:720px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+                <div>
+                    <h1 style="margin:0">Welcome <span th:text="${username}">user</span></h1>
+                    <div class="muted">You're signed in.</div>
+                </div>
+                <div>
+                    <a href="/login" class="btn secondary">Sign out</a>
+                </div>
+            </div>
+
+            <div style="margin-top:18px">This is a stub home page after login/signup.</div>
+        </div>
+    </div>
+</body>
+</html>

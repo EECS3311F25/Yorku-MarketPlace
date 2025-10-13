@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: Marketplace
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://us-west-2.db.thenile.dev:5432/main
+    username: 0199dba9-fd8e-7a96-ba77-b456aeded95f
+    password: 57e480f2-cb40-41b7-9aa5-aa2d91bef7ed
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect

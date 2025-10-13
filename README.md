@@ -3,9 +3,9 @@
 A Spring Boot–based campus-only marketplace prototype for York University. It currently implements **user sign up / sign in** with hashed passwords, **Thymeleaf** views, and a **PostgreSQL** datasource via Spring Data JPA.
 
 > **Course:** EECS 3311 — Software Design (Fall 2025)  
-> **Repo:** `Marketplace` (Maven)  
-> **Java:** 21 (per `pom.xml`)  
-> **Boot Parent:** 4.0.0-M3 (milestone)  
+> **Repo:** `Yorku-MarketPlace`  
+> **Java:** 21  
+> **Boot Parent:** 4.0.0-M3  
 
 ---
 

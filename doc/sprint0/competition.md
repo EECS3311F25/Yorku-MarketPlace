@@ -26,7 +26,7 @@ We are building a York only peer-to-peer marketplace  for safer, faster trades o
 ## How Our Product Is Different
 
 **York-only identity gate**  
-- Sign-in with yorku.ca (SSO) or Student Id login to ensure every account belongs to a student, staff, or faculty member.
+- Sign-in with Yorku Email (Only @yorku.ca or @my.yorku.ca) ogin to ensure every account belongs to a student, staff, or faculty member.
 
 **Campus-first taxonomy and metadata**  
 - **Course-aware listings:** textbook tags by course code, instructor, and editions.  
@@ -68,7 +68,7 @@ We are building a York only peer-to-peer marketplace  for safer, faster trades o
 - Large platforms (Facebook Marketplace, Kijiji, Craigslist) optimize for national or global liquidity and minimal onboarding friction; deep integration with one university’s identity system and policies is outside their general model.
 
 **Verification friction**  
-- Enforcing school SSO,email, or Student Id adds integration overhead and support costs. Community-vetted models (e.g., VarageSale) stops short of institutional SSO.
+- Enforcing school email Verification adds integration overhead and support costs. Community-vetted models (e.g., VarageSale) stops short of institutional SSO.
 
 **Academic metadata gap**  
 - Course codes, term cycles, and residence rules aren’t native to general marketplaces; adding them would require schema changes and new review policies.

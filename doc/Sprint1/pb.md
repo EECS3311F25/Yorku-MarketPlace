@@ -1,4 +1,3 @@
-
 # Product Backlog (pb.md)
 
 **Project**: YorkU Marketplace  
@@ -8,10 +7,10 @@
 _Backlog compiled from the Release Plan and Sprint‑1 standups._
 
 ## References
-- Release scope and timeline summarized in `rpm.md`. fileciteturn1file3
-- Standup (Oct 27): hosted site on dpdns domain, set up database via Nile Web Services. fileciteturn1file1
-- Standup (Oct 30): login system + `maven-publish.yml`; redirect loop when creating listing; plan SMTP verification limited to `@yorku.ca`. fileciteturn1file2
-- Standup (Nov 3): forgot‑password feature and demo video complete. fileciteturn1file0
+- Release scope and timeline summarized in `rpm.md`.
+- Standup (Oct 27): hosted site on dpdns domain, set up database via Nile Web Services. 
+- Standup (Oct 30): login system + `maven-publish.yml`; redirect loop when creating listing; plan SMTP verification limited to `@yorku.ca`.
+- Standup (Nov 3): forgot‑password feature and demo video complete. 
 
 ---
 
@@ -23,10 +22,10 @@ _Backlog compiled from the Release Plan and Sprint‑1 standups._
 ---
 
 ## Epics (from Release Plan)
-- **E1 — Account & Verification** (SSO/email, profile scaffold). fileciteturn1file3
-- **E2 — Listings & Search** (create/browse/detail/upload). fileciteturn1file3
-- **E3 — Messaging & Safety** (DMs, report) — partial in R1. fileciteturn1file3
-- **E4 — Transactions & Reviews** — defer except “mark sold”. fileciteturn1file3
+- **E1 — Account & Verification** (SSO/email, profile scaffold).
+- **E2 — Listings & Search** (create/browse/detail/upload).
+- **E3 — Messaging & Safety** (DMs, report) — partial in R1.
+- **E4 — Transactions & Reviews** — defer except “mark sold”.
 
 ---
 
@@ -34,10 +33,10 @@ _Backlog compiled from the Release Plan and Sprint‑1 standups._
 
 | ID | Epic | Title | As a… I want… so that… | Acceptance Criteria (Given/When/Then) | Priority | Est. SP | Notes/Deps |
 |---|---|---|---|---|:--:|:--:|---|
-| US‑001 | E1 | Email login + domain allow‑list | **YorkU student**; **sign up/login** with email; **keep community York‑only** | **Given** a user with `@yorku.ca` email **When** they register **Then** account is created and verification email sent; non‑York emails rejected | P0 | 8 | SMTP verification planned; restrict to `@yorku.ca`. fileciteturn1file2 |
-| US‑002 | E1 | Forgot password | **user**; **reset password via link**; **recover access** | **Given** registered email **When** reset requested **Then** email sent; token valid 30 min; password policy enforced | P0 | 5 | Implemented in Sprint‑1. fileciteturn1file0 |
+| US‑001 | E1 | Email login + domain allow‑list | **YorkU student**; **sign up/login** with email; **keep community York‑only** | **Given** a user with `@yorku.ca` email **When** they register **Then** account is created and verification email sent; non‑York emails rejected | P0 | 8 | SMTP verification planned; restrict to `@yorku.ca`. |
+| US‑002 | E1 | Forgot password | **user**; **reset password via link**; **recover access** | **Given** registered email **When** reset requested **Then** email sent; token valid 30 min; password policy enforced | P0 | 5 | Implemented in Sprint‑1.  |
 | US‑003 | E1 | Basic profile scaffold | **user**; **set display name and program**; **build trust** | Edit/save profile; default avatar; validation errors shown inline | P2 | 3 | Depends on US‑001 |
-| US‑004 | E2 | Create listing | **seller**; **post item with title, price, images**; **sell faster** | Required fields; preview; saved draft; published visible in detail page | P0 | 8 | Blocked by login redirect loop. fileciteturn1file2 |
+| US‑004 | E2 | Create listing | **seller**; **post item with title, price, images**; **sell faster** | Required fields; preview; saved draft; published visible in detail page | P0 | 8 | Blocked by login redirect loop. |
 | US‑005 | E2 | Listing detail page | **buyer**; **view listing**; **decide quickly** | Carousel; seller card; report button; contact CTA from detail | P1 | 5 | Depends on US‑004 |
 | US‑006 | E2 | Image upload service | **dev**; **store & serve images**; **fast previews** | Accept JPG/PNG; 5MB limit; thumbnail generated; invalid rejected | P1 | 5 | |
 | US‑007 | E2 | Browse & search (MVP) | **buyer**; **filter by category/price**; **find items** | Text search; category filter; sort by recent | P2 | 8 | |
@@ -51,26 +50,26 @@ _Backlog compiled from the Release Plan and Sprint‑1 standups._
 
 | ID | Area | Title | Description | Priority | Fix Plan |
 |---|---|---|---|:--:|---|
-| BUG‑001 | Auth/Routes | Login→Listing redirect loop | Creating a listing bounces back to login due to session validation | P0 | Rebuild HTML/CSS template; audit route guards; add e2e test. fileciteturn1file2 |
-| OPS‑001 | CI/CD | Maven publish workflow | `maven-publish.yml` added; validate on PRs and release tags | P2 | Add secrets, dry‑run, then enable. fileciteturn1file2 |
-| OPS‑002 | Hosting | Domain + DB setup | Site hosted on **dpdns**; DB on **Nile**; persist credentials | P1 | Infra docs + backups. fileciteturn1file1 |
+| BUG‑001 | Auth/Routes | Login→Listing redirect loop | Creating a listing bounces back to login due to session validation | P0 | Rebuild HTML/CSS template; audit route guards; add e2e test. |
+| OPS‑001 | CI/CD | Maven publish workflow | `maven-publish.yml` added; validate on PRs and release tags | P2 | Add secrets, dry‑run, then enable. |
+| OPS‑002 | Hosting | Domain + DB setup | Site hosted on **dpdns**; DB on **Nile**; persist credentials | P1 | Infra docs + backups.  |
 
 ---
 
 ## Non‑Functional Requirements
 
-- Auth & listing routes require logged‑in session (302s forbidden).  
-- Email verification for all new accounts. fileciteturn1file
-- Availability: 99.5% during R1 demo week; daily backups for DB. filecite turn file
+- Auth & listing routes require logged‑in session.  
+- Email verification for all new accounts.  
+- Availability: 99.5% during R1 demo week; daily backups for DB. 
 
 ---
 
 ## Sprint 1 Plan (from Release Plan) & Progress
 
-- Planned: Auth, Email Verification, Docs/Demo. fileciteturn1file3  
-- Done: Forgot password; demo video recorded. fileciteturn1file0  
-- In‑progress: Login with domain allow‑list (`@yorku.ca`), fix redirect loop, SMTP verification. fileciteturn1file2  
-- Infra: Hosted on dpdns; DB running on Nile. fileciteturn1file1
+- Planned: Auth, Email Verification, Docs/Demo.  
+- Done: Forgot password; demo video recorded.   
+- In‑progress: Login with domain allow‑list (`@yorku.ca`), fix redirect loop, SMTP verification.  
+- Infra: Hosted on dpdns; DB running on Nile. 
 
 ---
 

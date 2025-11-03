@@ -4,65 +4,69 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import eecs3311.group.p.Marketplace.model.User;
 import eecs3311.group.p.Marketplace.model.UserRepository;
 
+/**
+ * Service layer for handling all authentication-related business logic,
+ * such as user creation, verification, and password management.
+ */
 @Service
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository userRepository) {
+    /**
+     * Constructs a new AuthService with injected dependencies.
+     *
+     * @param userRepository  The repository for user data access.
+     * @param passwordEncoder The bean for encoding passwords (injected from SecurityConfig).
+     */
+    @Autowired
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
     
     /**
      * Finds a user by their username.
+     *
+     * @param username The username to search for.
+     * @return An Optional containing the User if found, or an empty Optional.
      */
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
-    /**
-    * Finds a user by their email.
-    */
-    public Optional<User> findByEmail(String email) {
-    return userRepository.findByEmail(email);
-    }
-
-    /**
-     *
-     * Logs a user in, checking both password and verification status.
-     */
-    public Optional<User> login(String username, String password) {
-        Optional<User> userOpt = userRepository.findByUsername(username);
-
-        if (userOpt.isEmpty()) {
-            return Optional.empty(); // User not found
-        }
-        User user = userOpt.get();
-        if (!user.isVerified()) {
-            return Optional.empty();
-        }
-        // Check if password matches AND user is verified
-        if (passwordEncoder.matches(password, user.getPasswordHash()) && user.isVerified()) {
-            return userOpt; // Success!
-        }
-
-        return Optional.empty(); // Failed login (bad pass or not verified)
-    }
-
-    /**
-     *
-     * Create Account but check for email/username to prevent duplicates.
-     */
     
     /**
+     * Finds a user by their email address.
      *
-     * Creates a new, unverified user with a verification code.
+     * @param email The email address to search for.
+     * @return An Optional containing the User if found, or an empty Optional.
+     */
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    // --- Note: The login() method was removed ---
+    // It is no longer necessary as Spring Security's AuthenticationManager
+    // and MyUserDetailsService handle the login process directly.
+
+    /**
+     * Creates a new, unverified user in the database.
+     * This method saves the user with a hashed password, a verification code,
+     * and a 'verified' status of false.
+     *
+     * @param username         The new user's username.
+     * @param password         The new user's plain-text password.
+     * @param email            The new user's email address.
+     * @param verificationCode The generated code for email verification.
+     * @return The saved User entity.
      */
     public User signupUnverified(String username, String password, String email, String verificationCode) {
         String hash = passwordEncoder.encode(password);
@@ -76,8 +80,13 @@ public class AuthService {
     }
     
     /**
-     * 
-     * Attempts to verify a user with the given code.
+     * Attempts to verify a user account using the provided code.
+     * If the username exists, the code matches, and the user is not already verified,
+     * the user's status is set to 'verified' and the code is cleared.
+     *
+     * @param username The username of the user to verify.
+     * @param code     The 6-digit verification code.
+     * @return true if verification was successful, false otherwise.
      */
     public boolean verifyUser(String username, String code) {
         Optional<User> userOpt = userRepository.findByUsername(username);
@@ -101,8 +110,10 @@ public class AuthService {
 
     /**
      * Creates a password reset token for a user found by email.
-     * @param email The user's email
-     * @return The generated token, or null if user not found.
+     * The token is valid for 1 hour.
+     *
+     * @param email The user's email address.
+     * @return The generated UUID token, or null if no user is found with that email.
      */
     public String createPasswordResetToken(String email) {
         Optional<User> userOpt = userRepository.findByEmail(email);
@@ -120,7 +131,9 @@ public class AuthService {
 
     /**
      * Validates a password reset token.
-     * @param token The token to validate
+     * Checks if the token exists and has not expired.
+     *
+     * @param token The UUID token to validate.
      * @return true if the token is valid and not expired, false otherwise.
      */
     public boolean validatePasswordResetToken(String token) {
@@ -142,9 +155,10 @@ public class AuthService {
 
     /**
      * Resets a user's password using a valid token.
-     * @param token The reset token
-     * @param newPassword The new, unhashed password
-     * @return true on success, false if token was invalid.
+     *
+     * @param token       The valid reset token.
+     * @param newPassword The new plain-text password to be hashed and saved.
+     * @return true on success, false if the token was invalid.
      */
     public boolean resetPassword(String token, String newPassword) {
         // First, validate the token
@@ -166,5 +180,5 @@ public class AuthService {
         userRepository.save(user);
         return true;
     }
-
 }
+

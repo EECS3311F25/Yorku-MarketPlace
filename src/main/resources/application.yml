@@ -12,3 +12,14 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    host: smtp.maileroo.com
+    port: 587
+    username: marketplace@356952d458b92ab0.maileroo.org
+    password: 255af039b8496bf9f6a4a3c5
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

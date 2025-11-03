@@ -1,5 +1,7 @@
 package eecs3311.group.p.Marketplace.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,5 +23,16 @@ public class User {
     private String passwordHash;
 
     private String email;
+ 
+    @Column(name = "verification_code")
+    private String verificationCode;
 
+    @Column(nullable = false)
+    private boolean verified = false;
+
+    @Column(name = "password_reset_token")
+    private String passwordResetToken;
+
+    @Column(name = "password_reset_token_expiry")
+    private LocalDateTime passwordResetTokenExpiry;
 }

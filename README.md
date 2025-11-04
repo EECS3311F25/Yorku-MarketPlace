@@ -63,7 +63,8 @@ and change the username and password.
 Repeat the same steps for smtp settings
 
 ### 4️⃣ Build & Run the App
-```bash mvn clean install
+```bash
+mvn clean install
 mvn spring-boot:run
 ```
 

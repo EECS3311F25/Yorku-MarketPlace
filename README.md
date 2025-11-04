@@ -74,6 +74,7 @@ then open:
 
 
 ### 🧩 Project Structure
+```bash
 src/
 ├── main/
 │   ├── java/com/marketplace/
@@ -95,7 +96,7 @@ src/
 │   └── static/
 │       └── styles.css
 └── test/
-
+```
 ### 🧱 Future Work
 
 Marketplace listings (CRUD)

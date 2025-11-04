@@ -4,13 +4,12 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import eecs3311.group.p.Marketplace.model.User;
 import eecs3311.group.p.Marketplace.model.UserRepository;
-
 /**
  * Service layer for handling all authentication-related business logic,
  * such as user creation, verification, and password management.
@@ -19,21 +18,19 @@ import eecs3311.group.p.Marketplace.model.UserRepository;
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     /**
      * Constructs a new AuthService with injected dependencies.
      *
      * @param userRepository  The repository for user data access.
      * @param passwordEncoder The bean for encoding passwords (injected from SecurityConfig).
      */
-    @Autowired
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+
+     public AuthService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
     
-    /**
+     /**
      * Finds a user by their username.
      *
      * @param username The username to search for.
@@ -42,7 +39,6 @@ public class AuthService {
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
-    
     /**
      * Finds a user by their email address.
      *
@@ -50,12 +46,8 @@ public class AuthService {
      * @return An Optional containing the User if found, or an empty Optional.
      */
     public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    return userRepository.findByEmail(email);
     }
-
-    // --- Note: The login() method was removed ---
-    // It is no longer necessary as Spring Security's AuthenticationManager
-    // and MyUserDetailsService handle the login process directly.
 
     /**
      * Creates a new, unverified user in the database.
@@ -131,9 +123,7 @@ public class AuthService {
 
     /**
      * Validates a password reset token.
-     * Checks if the token exists and has not expired.
-     *
-     * @param token The UUID token to validate.
+     * @param token The token to validate
      * @return true if the token is valid and not expired, false otherwise.
      */
     public boolean validatePasswordResetToken(String token) {
@@ -155,10 +145,9 @@ public class AuthService {
 
     /**
      * Resets a user's password using a valid token.
-     *
-     * @param token       The valid reset token.
-     * @param newPassword The new plain-text password to be hashed and saved.
-     * @return true on success, false if the token was invalid.
+     * @param token The reset token
+     * @param newPassword The new, unhashed password
+     * @return true on success, false if token was invalid.
      */
     public boolean resetPassword(String token, String newPassword) {
         // First, validate the token
@@ -180,5 +169,5 @@ public class AuthService {
         userRepository.save(user);
         return true;
     }
-}
 
+}

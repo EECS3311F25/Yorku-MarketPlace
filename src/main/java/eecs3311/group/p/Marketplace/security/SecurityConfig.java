@@ -11,7 +11,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
 import eecs3311.group.p.Marketplace.service.CustomUserDetailsService;
-
 /**
  * Main Spring Security configuration class for the application.
  *
@@ -20,14 +19,12 @@ import eecs3311.group.p.Marketplace.service.CustomUserDetailsService;
  * how form-based login behaves, and the logout process.
  */
 @Configuration
-@EnableMethodSecurity // Enables method-level security (e.g., @PreAuthorize)
+@EnableMethodSecurity
 public class SecurityConfig {
-
     /**
      * The custom user details service that links Spring Security to the user database.
      */
     private final CustomUserDetailsService userDetailsService;
-
     /**
      * Constructs the SecurityConfig and injects the required user details service.
      *
@@ -36,7 +33,6 @@ public class SecurityConfig {
     public SecurityConfig(CustomUserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
-
     /**
      * Provides the password encoder bean for the application.
      * Uses BCrypt for strong, salted password hashing.
@@ -47,7 +43,6 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
     /**
      * Configures the primary authentication provider.
      * This bean connects Spring Security to the {@link CustomUserDetailsService} (for finding users)
@@ -62,7 +57,6 @@ public class SecurityConfig {
         auth.setPasswordEncoder(passwordEncoder);
         return auth;
     }
-
     /**
      * Defines the main security filter chain that protects all HTTP requests.
      *
@@ -74,40 +68,34 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, DaoAuthenticationProvider authProvider) throws Exception {
         http
-            // 1. Set the authentication provider
             .authenticationProvider(authProvider)
-            
-            // 2. Define URL-based authorization rules
             .authorizeHttpRequests(authorize -> authorize
-                // Public endpoints
-                .requestMatchers("/", "/login", "/signup", "/verify", "/forgot-password", "/reset-password").permitAll()
-                // Static resources
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico").permitAll()
-                // All other requests must be authenticated
+                // public endpoints
+                .requestMatchers("/", "/login", "/signup", "/verify", "/forgot-password", "/reset-password", "/css/**", "/js/**", "/images/**").permitAll()
+                // static content
+                .requestMatchers("/webjars/**", "/favicon.ico").permitAll()
+                // API or admin could be further locked down
                 .anyRequest().authenticated()
             )
-            
-            // 3. Configure form-based login
+            // form login configuration
             .formLogin(form -> form
-                .loginPage("/login")               // The custom login page URL
-                .loginProcessingUrl("/login")      // The URL Spring Security handles for login (POST)
-                .usernameParameter("username")     // HTML form 'name' attribute for username
-                .passwordParameter("password")     // HTML form 'name' attribute for password
-                .defaultSuccessUrl("/home", true)  // Always redirect to /home on success
-                .failureUrl("/login?error=true")   // Redirect here on failed login
-                .permitAll()                       // Allow all users to access the login page
+                .loginPage("/login")
+                .loginProcessingUrl("/login")        // POST /login handled by Spring Security
+                .usernameParameter("username")
+                .passwordParameter("password")
+                .defaultSuccessUrl("/home", true)
+                .failureUrl("/login?error=true")
+                .permitAll()
             )
-            
-            // 4. Configure logout
+            // logout configuration
             .logout(logout -> logout
-                .logoutUrl("/logout")              // The URL Spring Security handles for logout
-                .logoutSuccessUrl("/login?logout=true") // Redirect here on successful logout
-                .invalidateHttpSession(true)       // End the user's session
-                .deleteCookies("JSESSIONID")       // Clear the session cookie
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout=true")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
             )
-            
-            // 5. Enable CSRF (Cross-Site Request Forgery) protection
-            .csrf(Customizer.withDefaults()); // Uses default CSRF settings (recommended)
+            // CSRF is enabled by default; keep it
+            .csrf(Customizer.withDefaults());
 
         return http.build();
     }

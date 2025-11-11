@@ -52,7 +52,7 @@ Make sure you have:
 
 ### 2️⃣ Clone the Repository
 ```bash
-git clone https://github.com/<your-org-or-username>/Yorku-MarketPlace.git
+git clone https://github.com/<EECS3311F25>/Yorku-MarketPlace.git
 cd Yorku-MarketPlace
 ```
 ### 3️⃣ Configure PostgreSQL and SMTP if you're using local SQL and Email server (Skip if you want to use the one provided in Project)

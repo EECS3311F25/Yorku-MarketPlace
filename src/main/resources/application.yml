@@ -23,3 +23,6 @@ spring:
           auth: true
           starttls:
             enable: true
+file:
+  upload-dir:
+    src\main\resources\uploads

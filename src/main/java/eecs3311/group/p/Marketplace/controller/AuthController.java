@@ -1,4 +1,4 @@
-package eecs3311.group.p.Marketplace;
+package eecs3311.group.p.Marketplace.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import eecs3311.group.p.Marketplace.service.AuthService;
 import eecs3311.group.p.Marketplace.service.EmailService;
+import eecs3311.group.p.Marketplace.service.ListingService;
 
 import java.util.Random;
 
@@ -23,16 +24,20 @@ public class AuthController {
 
     private final AuthService authService;
     private final EmailService emailService;
+    private final ListingService listingService;
+
 
     /**
      * Constructs a new AuthController with the necessary authentication and email services.
      *
      * @param authService  The service responsible for authentication logic.
      * @param emailService The service responsible for sending emails.
+     * @param listingService the service responsible for showing/creating Listings.
      */
-    public AuthController(AuthService authService, EmailService emailService) {
+    public AuthController(AuthService authService, EmailService emailService, ListingService listingService) {
         this.authService = authService;
         this.emailService = emailService;
+        this.listingService = listingService;
     }
 
     /**
@@ -288,8 +293,9 @@ public class AuthController {
      * @return The name of the home view template.
      */
     @GetMapping("/home")
-    public String home() {
-        return "home";
+    public String home(Model model) {
+    model.addAttribute("listings", listingService.getAllListings());
+    return "home";
     }
 
     /**

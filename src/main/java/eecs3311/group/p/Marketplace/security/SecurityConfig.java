@@ -74,6 +74,8 @@ public class SecurityConfig {
                 .requestMatchers("/", "/login", "/signup", "/verify", "/forgot-password", "/reset-password", "/css/**", "/js/**", "/images/**").permitAll()
                 // static content
                 .requestMatchers("/webjars/**", "/favicon.ico").permitAll()
+                .requestMatchers("/create-listing").authenticated()
+                .requestMatchers("/listing/*/edit", "/listing/*/delete").authenticated()
                 // API or admin could be further locked down
                 .anyRequest().authenticated()
             )
@@ -96,7 +98,7 @@ public class SecurityConfig {
             )
             // CSRF is enabled by default; keep it
             .csrf(Customizer.withDefaults());
-
+            
         return http.build();
     }
 }

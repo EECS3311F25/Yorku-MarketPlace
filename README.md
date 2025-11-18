@@ -22,16 +22,16 @@ The application currently supports **user authentication**, **email verification
 - Session-based login with `/home` protected route.
 
 ✅ **Frontend (Thymeleaf + TailwindCSS)**
-- Pages: `login.html`, `signup.html`, `verify.html`, `forgot-password.html`, `reset-password.html`, `home.html`.
+- Pages: `login.html`, `signup.html`, `verify.html`, `forgot-password.html`, `reset-password.html`, `home.html`,`create-listing.html`,`edit-listing.html`,`listing-details.html`.
 - Clean, responsive UI with alerts and form validation.
 - Works seamlessly with Spring Security error parameters (`?error`, `?logout`, etc.).
 
 ✅ **Backend (Spring Boot)**
-- Entity: `User`
-- Repository: `UserRepository` (JPA)
-- Services: `AuthService`, `CustomUserDetailsService`
-- Controller: `AuthController`
-- Config: `SecurityConfig` with `DaoAuthenticationProvider`
+- Entity: `User`,`Listing`
+- Repository: `UserRepository`,`ListingRepository` (JPA)
+- Services: `AuthService`, `CustomUserDetailsService`,`EmailService`,`FileStorageService`,`ListingService`
+- Controller: `AuthController`,`FileController`,`ListingController`
+- Config: `SecurityConfig`
 
 ✅ **Database**
 - Uses **PostgreSQL** (local or Docker) with Spring Data JPA.
@@ -79,17 +79,27 @@ src/
 ├── main/
 │   ├── java/com/marketplace/
 │   │   ├── controller/AuthController.java
+│   │   ├── controller/FileController.java
+│   │   ├── controller/ListingController.java
 │   │   ├── service/AuthService.java
 │   │   ├── service/CustomUserDetailsService.java
-│   │   ├── config/SecurityConfig.java
+│   │   ├── service/EmailService.java
+│   │   ├── service/ListingService.java
+│   │   ├── service/FileStorageService.java
+│   │   ├── security/SecurityConfig.java
 │   │   ├── model/User.java
-│   │   └── repository/UserRepository.java
+│   │   ├── model/Listing.java
+│   │   └── model/UserRepository.java
+│   │   └── model/ListingRepository.java
 │   ├── resources/
 │   │   ├── templates/
 │   │   │   ├── login.html
 │   │   │   ├── signup.html
 │   │   │   ├── verify.html
 │   │   │   ├── home.html
+│   │   │   ├── create-listing.html
+│   │   │   ├── edit-listing.html
+│   │   │   ├── listing-details.html
 │   │   │   ├── forgot-password.html
 │   │   │   └── reset-password.html
 │   │   └── application.properties
@@ -99,10 +109,6 @@ src/
 ```
 ### 🧱 Future Work
 
-Marketplace listings (CRUD)
-
 Messaging system (buyer ↔ seller)
 
 Role-based access (admin / moderator)
-
-Image upload and profile customization

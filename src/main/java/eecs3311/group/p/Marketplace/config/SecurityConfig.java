@@ -1,4 +1,4 @@
-package eecs3311.group.p.Marketplace.security;
+package eecs3311.group.p.Marketplace.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

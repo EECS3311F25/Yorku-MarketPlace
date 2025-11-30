@@ -52,7 +52,6 @@
     <!-- Edit / Delete Buttons: Only show if user is owner -->
     <div class="mt-6 flex gap-4"
          th:if="${isOwner}">
-
         <a th:href="@{'/listing/' + ${listing.id}+'/edit'}"
            class="px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">
             Edit Listing
@@ -67,6 +66,13 @@
         </form>
 
     </div>
+    <div th:if="${!isOwner}" class="mt-6">
+    <a th:href="@{'/chat/' + ${listing.id} + '/' + ${listing.owner.id}}"
+       class="px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">
+       Message Seller
+    </a>
+</div>
+
 
 </div>
 

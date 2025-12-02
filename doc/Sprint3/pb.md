@@ -93,21 +93,14 @@ _Backlog compiled from the Release Plan and Sprint-1 standups._
   - Exchange-location page draft  
 - Newly identified stories: **US-011, US-012, US-013**
 
----
+# Sprint 3 Summary
+**Focus:** Chat + Search completion + final polish  
+**Completed:**  
+- **Direct Messaging (Chat)**  
+- Final search backend (filters, sorting)  
+- Exchange location end-to-end  
+- Final CI pipeline & cleanup  
+- Full system integration test  
+- Demo-ready build delivered  
 
-## Backlog Ordering (current)
-
-1. US-001 (Email login + allow-list) — P0  
-2. BUG-001 (Redirect loop) — P0  
-3. US-004 (Create listing) — P0  
-4. **US-011 (Listing edit/delete ownership)** — P0  
-5. US-006 (Image upload) — P1  
-6. **US-012 (Exchange location)** — P1  
-7. US-007 (Browse/search MVP) — P2  
-8. US-003 (Profile) — P2  
-9. OPS-001 (Maven publish) — P2  
-10. US-008 (Report) — P3  
-11. US-009 (DMs stub) — P3  
-12. US-010 (Mark SOLD & rating) — P4  
-13. **US-013 (Image reliability)** — P4  
-
+ **Project Complete — Dec 1, 2025**

@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 @Entity
 @Table(name = "chat_messages")
 @Data
@@ -15,10 +18,11 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 2000)
     private String content;
 
-    private LocalDateTime timestamp = LocalDateTime.now();
+    @Column(nullable = false)
+    private LocalDateTime timestamp;
 
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)
@@ -30,5 +34,6 @@ public class ChatMessage {
 
     @ManyToOne
     @JoinColumn(name = "listing_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Listing listing;
 }

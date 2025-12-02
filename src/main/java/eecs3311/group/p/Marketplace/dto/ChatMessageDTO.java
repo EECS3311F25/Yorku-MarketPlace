@@ -4,10 +4,10 @@ import lombok.Data;
 
 @Data
 public class ChatMessageDTO {
-    private String chatId; // Used for the WebSocket room ID
+    private String chatId;      // e.g. "42_5_8" -> listingId_userA_userB
     private Long senderId;
     private Long receiverId;
+    private String senderName;  // filled by server when broadcasting
     private String content;
-    // We will parse the listingId from the chatId or add it here. 
-    // Ideally, add listingId to the JS object in chat.html, but we can parse it from chatId string.
+    private String timestamp;   // ISO string provided by server when broadcasting
 }

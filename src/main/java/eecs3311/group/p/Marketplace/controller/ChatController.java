@@ -11,11 +11,12 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class ChatController {
@@ -23,6 +24,7 @@ public class ChatController {
     private final ChatService chatService;
     private final AuthService authService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final DateTimeFormatter isoFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     public ChatController(ChatService chatService, AuthService authService, SimpMessagingTemplate messagingTemplate) {
         this.chatService = chatService;
@@ -30,56 +32,51 @@ public class ChatController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    // 1. Inbox Page
+    // Inbox page
     @GetMapping("/inbox")
     public String getInbox(Model model, Principal principal) {
+        if (principal == null) return "redirect:/login";
         User currentUser = authService.findByUsername(principal.getName()).orElseThrow();
         List<InboxConversationDTO> conversations = chatService.getUserConversations(currentUser.getId());
         model.addAttribute("conversations", conversations);
         return "inbox";
     }
 
-    // 2. Chat Page
+    // Chat page (renders initial history and chat metadata)
     @GetMapping("/chat/{listingId}/{otherUserId}")
-    public String getChatPage(@PathVariable Long listingId, 
-                              @PathVariable Long otherUserId, 
-                              Model model, 
+    public String getChatPage(@PathVariable Long listingId,
+                              @PathVariable Long otherUserId,
+                              Model model,
                               Principal principal) {
-        
+
+        if (principal == null) return "redirect:/login";
         User currentUser = authService.findByUsername(principal.getName()).orElseThrow();
-        
-        // Generate a unique room ID: "ListingID_BuyerID"
-        // If current user is owner, otherUser is buyer. Room = listing_other
-        // If current user is buyer, Room = listing_current
-        // We need to know who is the owner of the listing to determine the 'BuyerID' part of the key consistently.
-        // Simplified Logic: Just sort the two User IDs to make a unique key + Listing ID.
-        // RoomId = ListingID_SmallUserID_BigUserID
-        
+        Optional<User> otherUser = authService.findById(otherUserId);
+        // compute deterministic chatId: listing_smallUserId_bigUserId
         long u1 = Math.min(currentUser.getId(), otherUserId);
         long u2 = Math.max(currentUser.getId(), otherUserId);
         String chatId = listingId + "_" + u1 + "_" + u2;
+
         List<ChatMessage> history = chatService.getChatHistory(listingId, currentUser.getId(), otherUserId);
+
         model.addAttribute("chatHistory", history);
         model.addAttribute("chatId", chatId);
         model.addAttribute("currentUserId", currentUser.getId());
         model.addAttribute("otherUserId", otherUserId);
         model.addAttribute("listingId", listingId);
-        // Load history (Optional: you can also fetch this via AJAX, but Model is easier)
-        // Note: Your current chat.html doesn't iterate over history from Model, 
-        // it expects WebSocket pushes. You might want to modify chat.html to show history on load.
-        
+        model.addAttribute("otherUser", otherUser);
+
         return "chat";
     }
 
-    // 3. Handle sending messages via WebSocket
+    // WebSocket endpoint - receive from clients, save, broadcast to topic
     @MessageMapping("/chat.sendMessage")
     public void sendMessage(@Payload ChatMessageDTO chatMessageDTO) {
-        
-        // Parse listingId from the chatId (Format: ListingID_UserA_UserB)
+        // parse listing id from chatId (format: listing_u1_u2)
         String[] parts = chatMessageDTO.getChatId().split("_");
         Long listingId = Long.parseLong(parts[0]);
 
-        // Save to DB
+        // persist message
         ChatMessage saved = chatService.saveMessage(
                 chatMessageDTO.getSenderId(),
                 chatMessageDTO.getReceiverId(),
@@ -87,7 +84,16 @@ public class ChatController {
                 chatMessageDTO.getContent()
         );
 
-        // Send to the specific room topic
-        messagingTemplate.convertAndSend("/topic/chat/" + chatMessageDTO.getChatId(), chatMessageDTO);
+        // build outgoing DTO (with timestamp and senderName)
+        ChatMessageDTO outgoing = new ChatMessageDTO();
+        outgoing.setChatId(chatMessageDTO.getChatId());
+        outgoing.setSenderId(saved.getSender().getId());
+        outgoing.setReceiverId(saved.getRecipient().getId());
+        outgoing.setSenderName(saved.getSender().getUsername());
+        outgoing.setContent(saved.getContent());
+        outgoing.setTimestamp(saved.getTimestamp().toString());
+
+        // broadcast on topic for this chat
+        messagingTemplate.convertAndSend("/topic/chat/" + chatMessageDTO.getChatId(), outgoing);
     }
 }

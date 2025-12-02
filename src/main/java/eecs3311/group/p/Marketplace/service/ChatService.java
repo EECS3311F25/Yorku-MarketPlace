@@ -14,12 +14,17 @@ public class ChatService {
     private final AuthService authService;
     private final ListingService listingService;
 
-    public ChatService(ChatMessageRepository chatMessageRepository, AuthService authService, ListingService listingService) {
+    public ChatService(ChatMessageRepository chatMessageRepository,
+                       AuthService authService,
+                       ListingService listingService) {
         this.chatMessageRepository = chatMessageRepository;
         this.authService = authService;
         this.listingService = listingService;
     }
 
+    /**
+     * Save a message (used by WebSocket handler and fallback endpoints).
+     */
     public ChatMessage saveMessage(Long senderId, Long recipientId, Long listingId, String content) {
         User sender = authService.findById(senderId).orElseThrow();
         User recipient = authService.findById(recipientId).orElseThrow();
@@ -35,16 +40,20 @@ public class ChatService {
         return chatMessageRepository.save(msg);
     }
 
+    /**
+     * Get the full history for a conversation (listing + 2 users).
+     */
     public List<ChatMessage> getChatHistory(Long listingId, Long user1Id, Long user2Id) {
-        return chatMessageRepository.findByListingIdAndSenderIdAndRecipientIdOrListingIdAndSenderIdAndRecipientIdOrderByTimestampAsc(
-            listingId, user1Id, user2Id, listingId, user2Id, user1Id
-        );
+        return chatMessageRepository.findChatHistory(listingId, user1Id, user2Id);
     }
 
+    /**
+     * Build the inbox listing for a user - returns the most recent message grouped by listing+otherUser.
+     */
     public List<InboxConversationDTO> getUserConversations(Long currentUserId) {
         List<ChatMessage> allMessages = chatMessageRepository.findByUserInvolvement(currentUserId);
-        
-        // Map to store unique conversations. Key: ListingID + "_" + OtherUserID
+
+        // Map to preserve order (inbox sorted newest-first)
         Map<String, InboxConversationDTO> conversationMap = new LinkedHashMap<>();
 
         for (ChatMessage msg : allMessages) {
@@ -53,9 +62,9 @@ public class ChatService {
 
             if (!conversationMap.containsKey(key)) {
                 conversationMap.put(key, new InboxConversationDTO(
-                    msg.getListing(),
-                    otherUser,
-                    msg.getContent() // Since we sorted by DESC, the first one found is the latest
+                        msg.getListing(),
+                        otherUser,
+                        msg.getContent()
                 ));
             }
         }

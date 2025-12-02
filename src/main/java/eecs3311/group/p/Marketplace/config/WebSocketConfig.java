@@ -10,15 +10,17 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // Topic prefix for sending data TO clients
+        // broker destination prefix for server->client messages
         config.enableSimpleBroker("/topic");
-        // Application prefix for data FROM clients
+        // prefix for messages from client -> server @MessageMapping
         config.setApplicationDestinationPrefixes("/app");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Matches "new SockJS('/ws-chat')" in your chat.html
-        registry.addEndpoint("/ws-chat").withSockJS();
+        // SockJS endpoint (client connects here)
+        registry.addEndpoint("/ws-chat")
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
     }
 }

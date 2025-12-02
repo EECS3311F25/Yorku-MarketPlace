@@ -1,127 +1,119 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head>
-    <meta charset="UTF-8" />
-    <title>Chat</title>
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Chat</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body class="bg-gray-100 font-sans">
 
-<body class="bg-gray-100 h-screen flex flex-col">
+<nav class="bg-white shadow-md p-4">
+  <div class="max-w-4xl mx-auto flex justify-between items-center">
+    <a href="/home" class="text-lg font-semibold">Marketplace</a>
+    <a href="/inbox" class="text-gray-600 hover:text-blue-600">Back to Inbox</a>
+  </div>
+</nav>
 
-<div class="flex flex-col h-full max-w-3xl mx-auto w-full bg-white shadow-xl">
+<div class="max-w-4xl mx-auto mt-6">
+  <div class="bg-white rounded-lg shadow p-4">
 
-    <div class="p-4 bg-white border-b flex items-center justify-between z-10">
-        <div>
-            <h1 class="text-xl font-bold">Chat</h1>
-            <p class="text-sm text-gray-500" th:text="'Listing ID: ' + ${listingId}"></p>
+    <div class="pb-4 border-b mb-4 flex items-center justify-between">
+      <div>
+        <h2 class="text-xl font-bold">Chat</h2>
+        <p class="text-sm text-gray-600">Listing ID: <span th:text="${listingId}"></span></p>
+      </div>
+    </div>
+
+    <!-- messages -->
+    <div id="chatBox" class="h-96 overflow-y-auto p-4 space-y-3 bg-gray-50 rounded">
+      <!-- initial history -->
+      <div th:each="msg : ${chatHistory}">
+        <div th:classappend="${msg.sender.id == currentUserId} ? 'flex justify-end' : 'flex justify-start'">
+          <div th:class="${msg.sender.id == currentUserId} ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-900'"
+               class="max-w-xl px-4 py-2 rounded-lg">
+            <div class="text-sm" th:text="${msg.content}"></div>
+            <div class="text-xs mt-1 text-white/70" th:if="${msg.sender.id == currentUserId}" th:text="${#temporals.format(msg.timestamp,'yyyy-MM-dd HH:mm')}"></div>
+            <div class="text-xs mt-1 text-gray-500" th:if="${msg.sender.id != currentUserId}" th:text="${#temporals.format(msg.timestamp,'yyyy-MM-dd HH:mm')}"></div>
+          </div>
         </div>
-        <a href="/inbox" class="text-blue-600 hover:underline">Back to Inbox</a>
+      </div>
     </div>
 
-    <div id="chatArea" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
-
-        <div th:each="msg : ${chatHistory}"
-             class="flex w-full"
-             th:classappend="${msg.sender.id == currentUserId} ? 'justify-end' : 'justify-start'">
-
-            <div class="max-w-[70%] px-4 py-2 rounded-lg text-white"
-                 th:classappend="${msg.sender.id == currentUserId} ? 'bg-blue-600' : 'bg-gray-600'">
-                <span th:text="${msg.content}"></span>
-            </div>
-        </div>
-
+    <!-- input -->
+    <div class="mt-4 flex gap-3">
+      <input id="messageInput" type="text" placeholder="Type a message..."
+             class="flex-1 px-4 py-2 border rounded-lg"/>
+      <button id="sendBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Send</button>
     </div>
 
-    <div class="p-4 bg-white border-t flex items-center gap-2">
-        <input id="messageInput"
-               type="text"
-               class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-               placeholder="Type a message..."
-               onkeydown="if(event.key === 'Enter') sendMessage()">
-        
-        <button onclick="sendMessage()"
-                class="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition">
-            Send
-        </button>
-    </div>
-
+  </div>
 </div>
 
 <script th:inline="javascript">
-    /* Inject variables from Spring Controller */
-    const chatId = /*[[${chatId}]]*/ 'default_room';
+/*<![CDATA[*/
+    const chatId = /*[[${chatId}]]*/ '0_0_0';
     const currentUserId = /*[[${currentUserId}]]*/ 0;
     const otherUserId = /*[[${otherUserId}]]*/ 0;
-    const listingId = /*[[${listingId}]]*/ 0;
 
-    var stompClient = null;
+    let socket = new SockJS('/ws-chat');
+    let stompClient = Stomp.over(socket);
 
     function connect() {
-        // Connect to the endpoint defined in WebSocketConfig
-        var socket = new SockJS('/ws-chat'); 
-        stompClient = Stomp.over(socket);
-
-        stompClient.connect({}, function (frame) {
-            console.log("Connected: " + frame);
-
-            // Subscribe to the specific topic for this chat pair
-            stompClient.subscribe('/topic/chat/' + chatId, function (messageOutput) {
-                showMessage(JSON.parse(messageOutput.body));
+        stompClient.connect({}, function () {
+            // subscribe to the chat topic
+            stompClient.subscribe('/topic/chat/' + chatId, function (msg) {
+                const payload = JSON.parse(msg.body);
+                renderIncoming(payload);
             });
         });
     }
 
     function sendMessage() {
-        const input = document.getElementById("messageInput");
+        const input = document.getElementById('messageInput');
         const text = input.value.trim();
-        if (text === "") return;
+        if (!text) return;
 
-        // Construct DTO
-        const msg = {
+        const message = {
             chatId: chatId,
             senderId: currentUserId,
             receiverId: otherUserId,
             content: text
         };
 
-        // Send to Controller
-        stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(msg));
-        input.value = "";
+        stompClient.send('/app/chat.sendMessage', {}, JSON.stringify(message));
+        input.value = '';
     }
 
-    // Append a NEW message (Real-time)
-    function showMessage(msg) {
-        const chatArea = document.getElementById("chatArea");
-        const wrapper = document.createElement("div");
+    function renderIncoming(msg) {
+        const box = document.getElementById('chatBox');
+        const wrapper = document.createElement('div');
+        wrapper.className = (msg.senderId === currentUserId) ? 'flex justify-end' : 'flex justify-start';
 
-        // Determine alignment
-        const isMine = (msg.senderId === currentUserId);
-        wrapper.className = "flex w-full " + (isMine ? "justify-end" : "justify-start");
+        const bubble = document.createElement('div');
+        bubble.className = (msg.senderId === currentUserId) ? 'bg-blue-600 text-white px-4 py-2 rounded-lg max-w-xl' : 'bg-gray-200 text-gray-900 px-4 py-2 rounded-lg max-w-xl';
+        bubble.textContent = msg.content;
 
-        wrapper.innerHTML = `
-            <div class="max-w-[70%] px-4 py-2 rounded-lg text-white ${isMine ? 'bg-blue-600' : 'bg-gray-600'}">
-                ${msg.content}
-            </div>
-        `;
+        const ts = document.createElement('div');
+        ts.className = (msg.senderId === currentUserId) ? 'text-xs text-white/70 mt-1' : 'text-xs text-gray-500 mt-1';
+        ts.textContent = msg.timestamp ? msg.timestamp.replace('T',' ').substring(0,16) : '';
 
-        chatArea.appendChild(wrapper);
-        scrollToBottom();
+        bubble.appendChild(ts);
+        wrapper.appendChild(bubble);
+        box.appendChild(wrapper);
+
+        box.scrollTop = box.scrollHeight;
     }
 
-    function scrollToBottom() {
-        const chatArea = document.getElementById("chatArea");
-        chatArea.scrollTop = chatArea.scrollHeight;
-    }
+    document.getElementById('sendBtn').addEventListener('click', sendMessage);
+    document.getElementById('messageInput').addEventListener('keydown', function(e){
+        if (e.key === 'Enter') sendMessage();
+    });
 
-    // Initialize
-    window.onload = function() {
-        connect();
-        scrollToBottom(); // Scroll to bottom on initial load
-    };
+    connect();
+/*]]>*/
 </script>
-
 </body>
 </html>

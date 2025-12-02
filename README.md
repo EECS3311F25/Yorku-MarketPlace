@@ -20,18 +20,19 @@ The application currently supports **user authentication**, **email verification
 - Email verification using a 6-digit code.
 - Password reset with secure tokens and expiry time.
 - Session-based login with `/home` protected route.
+- Secure Messaging between Customer and Owner using WebSockets and SockJS.
 
 ✅ **Frontend (Thymeleaf + TailwindCSS)**
-- Pages: `login.html`, `signup.html`, `verify.html`, `forgot-password.html`, `reset-password.html`, `home.html`,`create-listing.html`,`edit-listing.html`,`listing-details.html`.
+- Pages: `login.html`, `signup.html`, `verify.html`, `forgot-password.html`, `reset-password.html`, `home.html`,`create-listing.html`,`edit-listing.html`,`listing-details.html`,`chat.html`,`inbox.html`.
 - Clean, responsive UI with alerts and form validation.
 - Works seamlessly with Spring Security error parameters (`?error`, `?logout`, etc.).
 
 ✅ **Backend (Spring Boot)**
-- Entity: `User`,`Listing`
-- Repository: `UserRepository`,`ListingRepository` (JPA)
-- Services: `AuthService`, `CustomUserDetailsService`,`EmailService`,`FileStorageService`,`ListingService`
-- Controller: `AuthController`,`FileController`,`ListingController`
-- Config: `SecurityConfig`
+- Entity: `User`,`Listing`, `ChatMessage`
+- Repository: `UserRepository`,`ListingRepository`,`ChatMessageRepository` (JPA)
+- Services: `AuthService`, `CustomUserDetailsService`,`EmailService`,`FileStorageService`,`ListingService`,`ChatService`
+- Controller: `AuthController`,`FileController`,`ListingController`,`ChatController`
+- Config: `SecurityConfig`,`WebSocketConfig`
 
 ✅ **Database**
 - Uses **PostgreSQL** (local or Docker) with Spring Data JPA.
@@ -78,22 +79,33 @@ then open:
 src/
 ├── main/
 │   ├── java/com/marketplace/
-│   │   ├── controller/AuthController.java
-│   │   ├── controller/FileController.java
-│   │   ├── controller/ListingController.java
-│   │   ├── service/AuthService.java
-│   │   ├── service/CustomUserDetailsService.java
-│   │   ├── service/EmailService.java
-│   │   ├── service/ListingService.java
-│   │   ├── service/FileStorageService.java
-│   │   ├── security/SecurityConfig.java
-│   │   ├── model/User.java
-│   │   ├── model/Listing.java
-│   │   └── model/UserRepository.java
-│   │   └── model/ListingRepository.java
+│   │   ├── controller
+│   │   │   ├──AuthController.java
+│   │   │   ├──FileController.java
+│   │   │   ├── ListingController.java
+│   │   │   ├── ChatController.java
+│   │   ├── service
+│   │   │   ├── AuthService.java
+│   │   │   ├── CustomUserDetailsService.java
+│   │   │   ├── EmailService.java
+│   │   │   ├── ListingService.java
+│   │   │   ├── FileStorageService.java
+│   │   │   ├── ChatService.java
+│   │   ├── config
+│   │   │   ├── SecurityConfig.java
+│   │   │   ├── WebSocketConfig.java
+│   │   ├── model
+│   │   │   ├── User.java
+│   │   │   ├── Listing.java
+│   │   │   ├── ChatMessage.java
+│   │   │   ├── UserRepository.java
+│   │   │   ├── ListingRepository.java
+│   │   │   ├── ChatMessageRepository.java
 │   ├── resources/
 │   │   ├── templates/
 │   │   │   ├── login.html
+│   │   │   ├── inbox.html
+│   │   │   ├── chat.html
 │   │   │   ├── signup.html
 │   │   │   ├── verify.html
 │   │   │   ├── home.html
@@ -107,8 +119,4 @@ src/
 │       └── styles.css
 └── test/
 ```
-### 🧱 Future Work
 
-Messaging system (buyer ↔ seller)
-
-Role-based access (admin / moderator)

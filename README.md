@@ -8,7 +8,7 @@ The application currently supports **user authentication**, **email verification
 > **Java:** 21  
 > **Spring Boot:** 3.3+  
 > **Build Tool:** Maven  
-
+> **Prod Url:** https://marketplace.purvesh.dpdns.org 
 ---
 
 ## ✨ Features (Implemented)
